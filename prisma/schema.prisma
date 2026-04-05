@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  shortDesc String   @map("short_desc")
+  longDesc  String   @map("long_desc")
+  tags      String[] @default([])
+  coverUrl  String?  @map("cover_url")
+  published Boolean  @default(false)
+
+  licenseSpdx          String? @map("license_spdx")
+  licenseUrl           String? @map("license_url")
+  sourceRepoUrl        String? @map("source_repo_url")
+  officialProjectUrl   String? @map("official_project_url")
+  copyrightAttribution String? @map("copyright_attribution") @db.Text
+  authorName           String? @map("author_name")
+  originalProjectName  String? @map("original_project_name")
+  systemRequirements   String? @map("system_requirements") @db.Text
+
+  downloads DownloadTarget[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("games")
+}
+
+model DownloadTarget {
+  id             String    @id @default(cuid())
+  gameId         String    @map("game_id")
+  game           Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  platform       String
+  url            String
+  label          String?
+  lastVerifiedAt DateTime? @map("last_verified_at")
+
+  @@map("download_targets")
+}
