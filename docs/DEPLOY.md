@@ -14,13 +14,16 @@ Never commit `.env` or real secrets. `.gitignore` already excludes `.env*`.
 
 ## 1. Push code to GitHub
 
-If this folder is not a Git repo yet:
+If this folder is **already** a Git repo with commits, skip `git init` / `git commit` and go straight to adding `origin` below.
+
+If it is not a repo yet:
 
 ```bash
 cd path/to/cursor-project-1
 git init
 git add .
 git commit -m "Initial commit: DubzyGames"
+git branch -M main
 ```
 
 On GitHub: **New repository** → create empty repo (no README). Then:
