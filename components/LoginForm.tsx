@@ -1,10 +1,14 @@
 ﻿"use client";
 
-import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BrandWordmark } from "@/components/BrandWordmark";
 
+/**
+ * Credentials sign-in via same requests as next-auth/react signIn(), but without
+ * redirect:false's fragile `new URL(data.url)` path (throws when `url` is missing
+ * — e.g. 500/config responses — leaving the UI stuck on "Signing in...").
+ */
 export function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/admin/games";
@@ -16,31 +20,80 @@ export function LoginForm() {
     e.preventDefault();
     setError(null);
     setPending(true);
-    const res = await signIn("admin", {
-      password,
-      redirect: false,
-      callbackUrl,
-    });
-    setPending(false);
-    if (res?.error) {
+    try {
+      const safePath =
+        callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
+          ? callbackUrl
+          : "/admin/games";
+      const absoluteCallback =
+        typeof window !== "undefined" ? `${window.location.origin}${safePath}` : safePath;
+
+      const csrfRes = await fetch("/api/auth/csrf", { credentials: "include" });
+      if (!csrfRes.ok) {
+        setError("Could not load CSRF token. Check NEXTAUTH_URL and redeploy.");
+        return;
+      }
+      const csrfJson: { csrfToken?: string } = await csrfRes.json().catch(() => ({}));
+      if (!csrfJson.csrfToken) {
+        setError("Invalid CSRF response. Set NEXTAUTH_SECRET on Vercel and redeploy.");
+        return;
+      }
+
+      const body = new URLSearchParams({
+        csrfToken: csrfJson.csrfToken,
+        callbackUrl: absoluteCallback,
+        json: "true",
+        password,
+      });
+
+      const res = await fetch("/api/auth/callback/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+        credentials: "include",
+      });
+
+      const data: { url?: string; message?: string } = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        let errCode: string | null = null;
+        if (typeof data.url === "string") {
+          try {
+            errCode = new URL(data.url).searchParams.get("error");
+          } catch {
+            /* ignore */
+          }
+        }
+        if (errCode === "CredentialsSignin") {
+          setError("Invalid password.");
+          return;
+        }
+        if (data.message) {
+          setError(`Server error: ${data.message}`);
+          return;
+        }
+        setError(
+          errCode
+            ? `Sign-in failed (${errCode}). Check Vercel env vars.`
+            : `Sign-in failed (HTTP ${res.status}). Add NEXTAUTH_SECRET, NEXTAUTH_URL, and ADMIN_PASSWORD in Vercel → Settings → Environment Variables, then redeploy.`,
+        );
+        return;
+      }
+
+      if (typeof data.url === "string" && /^https?:\/\//.test(data.url)) {
+        window.location.assign(data.url);
+        return;
+      }
+      window.location.assign(safePath);
+    } catch (err) {
       setError(
-        res.error === "CredentialsSignin"
-          ? "Invalid password."
-          : `Sign-in failed (${res.error}). Check NEXTAUTH_URL and NEXTAUTH_SECRET on the server.`,
+        err instanceof Error
+          ? err.message
+          : "Network error. Try again or check the browser console.",
       );
-      return;
+    } finally {
+      setPending(false);
     }
-    if (!res?.ok) {
-      setError("Sign-in failed. Try again.");
-      return;
-    }
-    // Full navigation so the session cookie from the API response is always visible to middleware
-    // (client router transitions can miss the cookie timing on some hosts).
-    const safeCallback =
-      callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
-        ? callbackUrl
-        : "/admin/games";
-    window.location.assign(safeCallback);
   }
 
   return (
