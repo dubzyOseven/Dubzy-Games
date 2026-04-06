@@ -1,13 +1,11 @@
 ﻿import Link from "next/link";
+import { GameCard } from "@/components/GameCard";
 import { getPublishedGames } from "@/lib/data/games";
 
 const btnPrimary =
   "inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/25 transition hover:from-cyan-400 hover:to-sky-400 hover:shadow-cyan-400/35";
 const btnGhost =
   "inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 backdrop-blur-sm transition hover:border-cyan-400/40 hover:bg-white/10";
-
-const gameCard =
-  "group block rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-lg shadow-black/20 backdrop-blur-md transition duration-300 hover:border-cyan-400/35 hover:bg-white/[0.08] hover:shadow-cyan-500/10 sm:p-5";
 
 export default async function HomePage() {
   const games = await getPublishedGames();
@@ -59,14 +57,13 @@ export default async function HomePage() {
           <ul className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5">
             {games.slice(0, 4).map((g) => (
               <li key={g.id}>
-                <Link href={`/games/${g.slug}`} className={gameCard}>
-                  <span className="text-lg font-semibold text-white group-hover:text-cyan-100">
-                    {g.title}
-                  </span>
-                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-400">
-                    {g.shortDesc}
-                  </p>
-                </Link>
+                <GameCard
+                  slug={g.slug}
+                  title={g.title}
+                  shortDesc={g.shortDesc}
+                  coverUrl={g.coverUrl}
+                  variant="featured"
+                />
               </li>
             ))}
           </ul>
