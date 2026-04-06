@@ -46,45 +46,70 @@ export function LoginForm() {
         password,
       });
 
+      // redirect: "manual" — avoid following 302 with a non-JSON body edge cases.
       const res = await fetch("/api/auth/callback/admin", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body.toString(),
         credentials: "include",
+        redirect: "manual",
       });
 
-      const data: { url?: string; message?: string } = await res.json().catch(() => ({}));
+      const ct = res.headers.get("content-type") || "";
+      let data: { url?: string; message?: string } = {};
+      if (ct.includes("application/json")) {
+        data = await res.json().catch(() => ({}));
+      }
 
-      if (!res.ok) {
-        let errCode: string | null = null;
-        if (typeof data.url === "string") {
-          try {
-            errCode = new URL(data.url).searchParams.get("error");
-          } catch {
-            /* ignore */
-          }
+      const rawUrl =
+        (typeof data.url === "string" && data.url.trim()) || res.headers.get("Location") || "";
+
+      const toAbsolute = (u: string) => {
+        if (u.startsWith("https://") || u.startsWith("http://")) return u;
+        if (u.startsWith("/")) return `${window.location.origin}${u}`;
+        return `${window.location.origin}${safePath}`;
+      };
+
+      const absoluteTarget = rawUrl ? toAbsolute(rawUrl) : "";
+
+      const authErrorParams = (() => {
+        if (!absoluteTarget) return null;
+        try {
+          return new URL(absoluteTarget).searchParams.get("error");
+        } catch {
+          return null;
         }
-        if (errCode === "CredentialsSignin") {
-          setError("Invalid password.");
-          return;
-        }
-        if (data.message) {
-          setError(`Server error: ${data.message}`);
-          return;
-        }
-        setError(
-          errCode
-            ? `Sign-in failed (${errCode}). Check Vercel env vars.`
-            : `Sign-in failed (HTTP ${res.status}). Add NEXTAUTH_SECRET, NEXTAUTH_URL, and ADMIN_PASSWORD in Vercel → Settings → Environment Variables, then redeploy.`,
-        );
+      })();
+
+      // NextAuth often returns JSON { url } with HTTP 302; res.ok is false for 302, so we must
+      // not treat that as failure when url is a normal post-login destination.
+      if (absoluteTarget && !authErrorParams) {
+        window.location.href = absoluteTarget;
         return;
       }
 
-      if (typeof data.url === "string" && /^https?:\/\//.test(data.url)) {
-        window.location.assign(data.url);
+      if (authErrorParams === "CredentialsSignin") {
+        setError("Invalid password.");
         return;
       }
-      window.location.assign(safePath);
+      if (data.message) {
+        setError(`Server error: ${data.message}`);
+        return;
+      }
+      if (authErrorParams) {
+        setError(`Sign-in failed (${authErrorParams}). Check Vercel env vars.`);
+        return;
+      }
+
+      // No URL in body: rare; try going to admin if status looks OK.
+      if (res.ok || res.status === 0 || res.status === 302 || res.status === 303) {
+        window.location.href = `${window.location.origin}${safePath}`;
+        return;
+      }
+
+      setError(
+        `Sign-in failed (HTTP ${res.status}). Add NEXTAUTH_SECRET, NEXTAUTH_URL, and ADMIN_PASSWORD in Vercel → Environment Variables, then redeploy.`,
+      );
     } catch (err) {
       setError(
         err instanceof Error
