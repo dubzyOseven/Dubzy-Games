@@ -1,12 +1,11 @@
 ﻿"use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BrandWordmark } from "@/components/BrandWordmark";
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/admin/games";
   const [password, setPassword] = useState("");
@@ -24,11 +23,24 @@ export function LoginForm() {
     });
     setPending(false);
     if (res?.error) {
-      setError("Invalid password.");
+      setError(
+        res.error === "CredentialsSignin"
+          ? "Invalid password."
+          : `Sign-in failed (${res.error}). Check NEXTAUTH_URL and NEXTAUTH_SECRET on the server.`,
+      );
       return;
     }
-    router.push(callbackUrl);
-    router.refresh();
+    if (!res?.ok) {
+      setError("Sign-in failed. Try again.");
+      return;
+    }
+    // Full navigation so the session cookie from the API response is always visible to middleware
+    // (client router transitions can miss the cookie timing on some hosts).
+    const safeCallback =
+      callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
+        ? callbackUrl
+        : "/admin/games";
+    window.location.assign(safeCallback);
   }
 
   return (
