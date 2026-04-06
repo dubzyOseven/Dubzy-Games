@@ -124,7 +124,7 @@ export function LoginForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="mx-auto max-w-sm space-y-6 rounded-2xl border border-white/10 bg-white/[0.04] p-8 shadow-2xl shadow-cyan-500/10 backdrop-blur-md"
+      className="mx-auto w-full max-w-sm space-y-5 rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-cyan-500/10 backdrop-blur-md sm:space-y-6 sm:p-8"
     >
       <div>
         <p className="text-sm font-medium text-slate-400">Admin</p>

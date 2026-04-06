@@ -7,9 +7,9 @@ export const metadata: Metadata = {
 
 export default function DisclaimerPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-14 sm:py-16">
-      <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 shadow-xl shadow-black/20 backdrop-blur-md sm:p-10">
-        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Disclaimer</h1>
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14 md:py-16">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-xl shadow-black/20 backdrop-blur-md sm:rounded-3xl sm:p-10">
+        <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl">Disclaimer</h1>
         <div className="mt-8 space-y-5 leading-relaxed text-slate-400">
           <p>
             <strong className="text-slate-200">DubzyGames</strong> lists third-party games and software.

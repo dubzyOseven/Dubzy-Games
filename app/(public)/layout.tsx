@@ -9,9 +9,9 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col text-slate-100">
+    <div className="flex min-h-screen flex-col overflow-x-hidden text-slate-100">
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 min-w-0">{children}</main>
       <SiteFooter />
     </div>
   );

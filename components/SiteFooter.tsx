@@ -3,9 +3,9 @@ import { BrandWordmark } from "@/components/BrandWordmark";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-white/10 bg-slate-950/60 px-4 py-12 backdrop-blur-sm">
+    <footer className="mt-auto border-t border-white/10 bg-slate-950/60 px-4 py-10 backdrop-blur-sm sm:py-12">
       <div className="mx-auto max-w-5xl space-y-4">
-        <p className="text-sm leading-relaxed text-slate-400">
+        <p className="text-sm leading-relaxed text-slate-400 sm:text-[0.9375rem]">
           <BrandWordmark className="text-base" /> — curated listings. Downloads open the{" "}
           <strong className="font-semibold text-slate-200">official source</strong> in your browser.
           Files are served by third parties; verify licenses and checksums with each project.

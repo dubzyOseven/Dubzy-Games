@@ -45,8 +45,8 @@ export default async function GamePage({ params }: Props) {
   if (!game) notFound();
 
   return (
-    <article className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
-      <div className="flex flex-col gap-10 lg:flex-row lg:gap-12">
+    <article className="mx-auto max-w-5xl px-4 py-10 sm:py-14 md:py-16">
+      <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
         <div className="flex-1">
           {game.coverUrl ? (
             <>
@@ -54,18 +54,20 @@ export default async function GamePage({ params }: Props) {
               <img
                 src={game.coverUrl}
                 alt=""
-                className="w-full max-w-md rounded-2xl border border-white/10 object-cover shadow-2xl shadow-cyan-500/10 ring-1 ring-white/5"
+                className="mx-auto w-full max-w-md rounded-2xl border border-white/10 object-cover shadow-2xl shadow-cyan-500/10 ring-1 ring-white/5 lg:mx-0"
               />
             </>
           ) : (
-            <div className="flex h-52 max-w-md items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] text-sm text-slate-500 backdrop-blur-sm">
+            <div className="mx-auto flex h-48 max-w-md items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] text-sm text-slate-500 backdrop-blur-sm sm:h-52 lg:mx-0">
               No cover image
             </div>
           )}
         </div>
         <div className="flex-[2]">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{game.title}</h1>
-          <p className="mt-3 text-lg leading-relaxed text-slate-400">{game.shortDesc}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+            {game.title}
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-slate-400 sm:text-lg">{game.shortDesc}</p>
           {game.tags.length > 0 ? (
             <div className="mt-5 flex flex-wrap gap-2">
               {game.tags.map((t) => (
@@ -90,7 +92,7 @@ export default async function GamePage({ params }: Props) {
               <Link
                 key={d.id}
                 href={`/download/${game.slug}?platform=${d.platform}`}
-                className={dlBtn}
+                className={`${dlBtn} w-full text-center sm:w-auto sm:min-w-[12rem]`}
               >
                 {d.label
                   ? `${d.label} (${platformLabel[d.platform] ?? d.platform})`
@@ -106,7 +108,7 @@ export default async function GamePage({ params }: Props) {
                 href={game.officialProjectUrl}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="font-medium text-cyan-400 hover:text-cyan-300 hover:underline"
+                className="break-all font-medium text-cyan-400 hover:text-cyan-300 hover:underline"
               >
                 {game.officialProjectUrl}
               </a>
@@ -115,22 +117,24 @@ export default async function GamePage({ params }: Props) {
         </div>
       </div>
 
-      <section className="mt-16 max-w-none">
-        <h2 className="text-xl font-bold text-white">About</h2>
-        <div className="mt-3 whitespace-pre-wrap leading-relaxed text-slate-400">{game.longDesc}</div>
+      <section className="mt-12 max-w-none sm:mt-16">
+        <h2 className="text-lg font-bold text-white sm:text-xl">About</h2>
+        <div className="mt-3 whitespace-pre-wrap break-words leading-relaxed text-slate-400">
+          {game.longDesc}
+        </div>
       </section>
 
       {game.systemRequirements ? (
-        <section className="mt-12">
-          <h2 className="text-xl font-bold text-white">System requirements</h2>
-          <p className="mt-3 whitespace-pre-wrap leading-relaxed text-slate-400">
+        <section className="mt-10 sm:mt-12">
+          <h2 className="text-lg font-bold text-white sm:text-xl">System requirements</h2>
+          <p className="mt-3 whitespace-pre-wrap break-words leading-relaxed text-slate-400">
             {game.systemRequirements}
           </p>
         </section>
       ) : null}
 
-      <section className="mt-14 rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/10 via-white/[0.03] to-cyan-500/5 p-6 shadow-xl shadow-violet-500/5 backdrop-blur-md sm:p-8">
-        <h2 className="text-lg font-bold bg-gradient-to-r from-cyan-200 to-fuchsia-200 bg-clip-text text-transparent">
+      <section className="mt-12 rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/10 via-white/[0.03] to-cyan-500/5 p-5 shadow-xl shadow-violet-500/5 backdrop-blur-md sm:mt-14 sm:p-8">
+        <h2 className="text-base font-bold bg-gradient-to-r from-cyan-200 to-fuchsia-200 bg-clip-text text-transparent sm:text-lg">
           License & attribution
         </h2>
         <dl className="mt-5 space-y-4 text-sm text-slate-400">
@@ -148,7 +152,7 @@ export default async function GamePage({ params }: Props) {
                   href={game.licenseUrl}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="text-cyan-400 hover:underline"
+                  className="break-all text-cyan-400 hover:underline"
                 >
                   {game.licenseUrl}
                 </a>
@@ -163,7 +167,7 @@ export default async function GamePage({ params }: Props) {
                   href={game.sourceRepoUrl}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="text-cyan-400 hover:underline"
+                  className="break-all text-cyan-400 hover:underline"
                 >
                   {game.sourceRepoUrl}
                 </a>
