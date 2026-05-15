@@ -84,4 +84,28 @@ if (weak.length) {
   for (const w of weak) console.warn("  -", w);
 }
 
+const googleId = !!env.GOOGLE_CLIENT_ID?.trim();
+const googleSecret = !!env.GOOGLE_CLIENT_SECRET?.trim();
+if (googleId !== googleSecret) {
+  console.warn(
+    "Warnings:\n  - Google OAuth is partially configured. Set both GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.",
+  );
+}
+
+const githubId = !!env.GITHUB_ID?.trim();
+const githubSecret = !!env.GITHUB_SECRET?.trim();
+if (githubId !== githubSecret) {
+  console.warn(
+    "Warnings:\n  - GitHub OAuth is partially configured. Set both GITHUB_ID and GITHUB_SECRET.",
+  );
+}
+
+const hasOAuth =
+  (googleId && googleSecret) || (githubId && githubSecret);
+if (!hasOAuth) {
+  console.warn(
+    "Warnings:\n  - No OAuth providers configured. Public /auth/signin will show a notice until you add Google and/or GitHub env vars.",
+  );
+}
+
 console.log("Environment check OK (required keys present).");

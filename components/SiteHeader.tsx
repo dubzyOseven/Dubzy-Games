@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrandWordmark } from "@/components/BrandWordmark";
+import { HeaderAuth } from "@/components/HeaderAuth";
 
 const navLink =
   "rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-cyan-200 md:px-3 md:py-2 md:text-slate-400";
@@ -62,9 +63,10 @@ export function SiteHeader() {
           <Link href="/contact" className={navLink}>
             Contact
           </Link>
+          <HeaderAuth layout="desktop" />
           <Link
             href="/admin/login"
-            className="ml-0 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-200 transition hover:border-cyan-400/50 hover:bg-cyan-500/20 md:ml-1"
+            className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-200 transition hover:border-cyan-400/50 hover:bg-cyan-500/20"
           >
             Admin
           </Link>
@@ -94,6 +96,7 @@ export function SiteHeader() {
               <Link href="/contact" className={navLink} onClick={() => setMenuOpen(false)}>
                 Contact
               </Link>
+              <HeaderAuth layout="mobile" onNavigate={() => setMenuOpen(false)} />
               <Link
                 href="/admin/login"
                 className="mt-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2.5 text-center text-sm font-medium text-cyan-200 transition hover:border-cyan-400/50 hover:bg-cyan-500/20"
